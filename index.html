@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Portal Warga & Admin Dashboard</title>
+<style>
+  :root {
+    --primary: #4f46e5;
+    --primary-dark: #4338ca;
+    --secondary: #f3f4f6;
+    --accent: #10b981;
+    --danger: #ef4444;
+    --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0; padding: 0;
+    font-family: var(--font-family);
+    background: var(--secondary);
+    color: #333;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  header {
+    width: 100%;
+    background: var(--primary);
+    color: white;
+    padding: 1rem;
+    text-align: center;
+    font-weight: 700;
+    font-size: 1.5rem;
+  }
+  main {
+    max-width: 480px;
+    width: 100%;
+    background: white;
+    margin: 2rem 1rem;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 6px 10px rgba(0,0,0,0.1);
+  }
+  h2 {
+    text-align: center;
+    margin-bottom: 1rem;
+    color: var(--primary-dark);
+  }
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  label {
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  input[type="text"],
+  input[type="password"],
+  input[type="email"] {
+    padding: 0.6rem 0.8rem;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+  }
+  input[type="text"]:focus,
+  input[type="password"]:focus,
+  input[type="email"]:focus {
+    border-color: var(--primary);
+    outline: none;
+  }
+  button {
+    padding: 0.8rem;
+    background: var(--primary);
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  button:hover {
+    background: var(--primary-dark);
+  }
+  .tab-buttons {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    gap: 1rem;
+  }
+  .tab-buttons button {
+    flex: 1;
+    padding: 0.75rem 0;
+    background: #e0e7ff;
+    color: var(--primary-dark);
+    border-radius: 6px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  .tab-buttons button.active {
+    background: var(--primary);
+    color: white;
+  }
+  .message {
+    margin: 0.5rem 0;
+    font-weight: 600;
+    text-align: center;
+  }
+  .error {
+    color: var(--danger);
+  }
+  .success {
+    color: var(--accent);
+  }
+  .dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .dashboard header {
+    text-align: right;
+  }
+  .discord-link-list {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+  }
+  .discord-link-list li {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .discord-link-list a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+    word-break: break-word;
+  }
+  .discord-link-list button {
+    background: var(--danger);
+    border: none;
+    color: white;
+    border-radius: 4px;
+    padding: 0 0.5rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.3s ease;
+  }
+  .discord-link-list button:hover {
+    background: #b91c1c;
+  }
+  .add-link-form {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  .add-link-form input {
+    flex: 1;
+  }
+  @media (max-width: 540px) {
+    main {
+      margin: 1rem;
+      padding: 1rem;
+    }
+  }
+</style>
+</head>
+<body>
+
+<header>Link Discord Garuda Nusantara Rp</header>
+
+<main>
+
+  <div class="tab-buttons">
+    <button id="tab-login" class="active">Login Warga</button>
+    <button id="tab-register">Daftar Warga</button>
+    <button id="tab-admin-login">Login Admin</button>
+  </div>
+
+  <!-- Resident Login -->
+  <section id="resident-login-section">
+    <h2>Login Warga</h2>
+    <form id="resident-login-form">
+      <label for="resident-login-username">Username</label>
+      <input type="text" id="resident-login-username" required autocomplete="username" />
+      <label for="resident-login-password">Password</label>
+      <input type="password" id="resident-login-password" required autocomplete="current-password" />
+      <button type="submit">Login</button>
+      <div id="resident-login-message" class="message"></div>
+    </form>
+  </section>
+
+  <!-- Resident Registration -->
+  <section id="resident-register-section" style="display:none;">
+    <h2>Daftar Warga</h2>
+    <form id="resident-register-form">
+      <label for="resident-register-username">Username</label>
+      <input type="text" id="resident-register-username" required autocomplete="username" />
+      <label for="resident-register-password">Password</label>
+      <input type="password" id="resident-register-password" required autocomplete="new-password" />
+      <button type="submit">Daftar</button>
+      <div id="resident-register-message" class="message"></div>
+    </form>
+  </section>
+
+  <!-- Admin Login -->
+  <section id="admin-login-section" style="display:none;">
+    <h2>Login Admin</h2>
+    <form id="admin-login-form">
+      <label for="admin-login-username">Username</label>
+      <input type="text" id="admin-login-username" required autocomplete="username" />
+      <label for="admin-login-password">Password</label>
+      <input type="password" id="admin-login-password" required autocomplete="current-password" />
+      <button type="submit">Login</button>
+      <div id="admin-login-message" class="message"></div>
+    </form>
+  </section>
+
+  <!-- Resident Dashboard -->
+  <section id="resident-dashboard-section" style="display:none;">
+    <header>
+      <button id="resident-logout-btn" title="Logout">Keluar</button>
+    </header>
+    <h2>Link Discord Dan Keperluan Server</h2>
+    <p>Selamat datang, <span id="resident-username-display"></span>!</p>
+    <div>
+      <h3>Link Server Discord Garuda </h3>
+      <ul id="discord-links-resident" class="discord-link-list" aria-label="Discord Server Links"></ul>
+    </div>
+    <div>
+      <h3>Link Keperluan Server</h3>
+      <ul id="website-links-resident" class="discord-link-list" aria-label="Other Website Links"></ul>
+    </div>
+  </section>
+
+  <!-- Admin Dashboard -->
+  <section id="admin-dashboard-section" style="display:none;">
+    <header>
+      <button id="admin-logout-btn" title="Logout">Keluar</button>
+    </header>
+    <h2>Dashboard Admin</h2>
+
+    <form id="add-discord-form" class="add-link-form" aria-label="Tambah Link Server Discord">
+      <input type="text" id="discord-link-input" placeholder="Masukkan link server Discord" required />
+      <button type="submit">Tambah Link</button>
+    </form>
+    <div id="add-discord-message" class="message"></div>
+    <div>
+      <h3>Link Server Discord yang Ada</h3>
+      <ul id="discord-links-admin" class="discord-link-list" aria-label="Discord Server Links Admin"></ul>
+    </div>
+
+    <form id="add-website-form" class="add-link-form" aria-label="Tambah Link Website Lain">
+      <input type="text" id="website-link-input" placeholder="Masukkan link website lain" required />
+      <button type="submit">Tambah Link</button>
+    </form>
+    <div id="add-website-message" class="message"></div>
+    <div>
+      <h3>Link Website Lain yang Ada</h3>
+      <ul id="website-links-admin" class="discord-link-list" aria-label="Other Website Links Admin"></ul>
+    </div>
+  </section>
+  
+</main>
+
+<script>
+(() => {
+  // Admin hardcoded credentials
+  const ADMIN_USERNAME = "admin";
+  const ADMIN_PASSWORD = "admin5555";
+
+  // Elements references
+  const tabs = {
+    login: document.getElementById('tab-login'),
+    register: document.getElementById('tab-register'),
+    adminLogin: document.getElementById('tab-admin-login')
+  };
+
+  const sections = {
+    login: document.getElementById('resident-login-section'),
+    register: document.getElementById('resident-register-section'),
+    adminLogin: document.getElementById('admin-login-section'),
+    residentDashboard: document.getElementById('resident-dashboard-section'),
+    adminDashboard: document.getElementById('admin-dashboard-section')
+  };
+
+  const residentLoginForm = document.getElementById('resident-login-form');
+  const residentRegisterForm = document.getElementById('resident-register-form');
+  const adminLoginForm = document.getElementById('admin-login-form');
+  const addDiscordForm = document.getElementById('add-discord-form');
+  const addWebsiteForm = document.getElementById('add-website-form');
+
+  // Messages
+  const residentLoginMessage = document.getElementById('resident-login-message');
+  const residentRegisterMessage = document.getElementById('resident-register-message');
+  const adminLoginMessage = document.getElementById('admin-login-message');
+  const addDiscordMessage = document.getElementById('add-discord-message');
+  const addWebsiteMessage = document.getElementById('add-website-message');
+
+  // Other Elements
+  const residentUsernameDisplay = document.getElementById('resident-username-display');
+  const discordLinksResident = document.getElementById('discord-links-resident');
+  const discordLinksAdmin = document.getElementById('discord-links-admin');
+  const websiteLinksResident = document.getElementById('website-links-resident');
+  const websiteLinksAdmin = document.getElementById('website-links-admin');
+
+  const residentLogoutBtn = document.getElementById('resident-logout-btn');
+  const adminLogoutBtn = document.getElementById('admin-logout-btn');
+
+  // LocalStorage keys
+  const USER_STORE_KEY = "residents";
+  const DISCORD_LINKS_KEY = "discordLinks";
+  const WEBSITE_LINKS_KEY = "websiteLinks";
+  const SESSION_USER_KEY = "loggedInResident";
+  const SESSION_ADMIN_KEY = "loggedInAdmin";
+
+  // Helper Functions
+  function getResidents() {
+    return JSON.parse(localStorage.getItem(USER_STORE_KEY) || "[]");
+  }
+  function saveResidents(users) {
+    localStorage.setItem(USER_STORE_KEY, JSON.stringify(users));
+  }
+  function getDiscordLinks() {
+    return JSON.parse(localStorage.getItem(DISCORD_LINKS_KEY) || "[]");
+  }
+  function saveDiscordLinks(links) {
+    localStorage.setItem(DISCORD_LINKS_KEY, JSON.stringify(links));
+  }
+  function getWebsiteLinks() {
+    return JSON.parse(localStorage.getItem(WEBSITE_LINKS_KEY) || "[]");
+  }
+  function saveWebsiteLinks(links) {
+    localStorage.setItem(WEBSITE_LINKS_KEY, JSON.stringify(links));
+  }
+  function setResidentSession(username) {
+    localStorage.setItem(SESSION_USER_KEY, username);
+  }
+  function clearResidentSession() {
+    localStorage.removeItem(SESSION_USER_KEY);
+  }
+  function getResidentSession() {
+    return localStorage.getItem(SESSION_USER_KEY);
+  }
+  function setAdminSession() {
+    localStorage.setItem(SESSION_ADMIN_KEY, "true");
+  }
+  function clearAdminSession() {
+    localStorage.removeItem(SESSION_ADMIN_KEY);
+  }
+  function getAdminSession() {
+    return localStorage.getItem(SESSION_ADMIN_KEY) === "true";
+  }
+
+  function sanitizeInput(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  // Tab switching
+  function switchTab(tab) {
+    // Reset messages
+    residentLoginMessage.textContent = "";
+    residentRegisterMessage.textContent = "";
+    adminLoginMessage.textContent = "";
+    addDiscordMessage.textContent = "";
+    addWebsiteMessage.textContent = "";
+
+    // Hide all sections
+    Object.values(sections).forEach(s => s.style.display = "none");
+    // Deactivate all tabs
+    Object.values(tabs).forEach(t => t.classList.remove('active'));
+
+    if (tab === 'login') {
+      tabs.login.classList.add('active');
+      sections.login.style.display = "block";
+    } else if (tab === 'register') {
+      tabs.register.classList.add('active');
+      sections.register.style.display = "block";
+    } else if (tab === 'adminLogin') {
+      tabs.adminLogin.classList.add('active');
+      sections.adminLogin.style.display = "block";
+    }
+  }
+
+  // Render functions
+  function renderDiscordLinksForResident() {
+    const links = getDiscordLinks();
+    discordLinksResident.innerHTML = "";
+    if (links.length === 0) {
+      discordLinksResident.innerHTML = "<li>Tidak ada link server Discord tersedia.</li>";
+      return;
+    }
+    links.forEach(link => {
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      a.href = link;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      a.textContent = link;
+      li.appendChild(a);
+      discordLinksResident.appendChild(li);
+    });
+  }
+
+  function renderWebsiteLinksForResident() {
+    const links = getWebsiteLinks();
+    websiteLinksResident.innerHTML = "";
+    if (links.length === 0) {
+      websiteLinksResident.innerHTML = "<li>Tidak ada link website tersedia.</li>";
+      return;
+    }
+    links.forEach(link => {
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      a.href = link;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      a.textContent = link;
+      li.appendChild(a);
+      websiteLinksResident.appendChild(li);
+    });
+  }
+
+  function renderDiscordLinksForAdmin() {
+    const links = getDiscordLinks();
+    discordLinksAdmin.innerHTML = "";
+    if (links.length === 0) {
+      discordLinksAdmin.innerHTML = "<li>Belum ada link server Discord ditambahkan.</li>";
+      return;
+    }
+    links.forEach((link, index) => {
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      a.href = link;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      a.textContent = link;
+
+      const btnRemove = document.createElement('button');
+      btnRemove.textContent = "Hapus";
+      btnRemove.title = "Hapus Link";
+      btnRemove.addEventListener('click', () => {
+        const confirmDel = confirm("Yakin ingin menghapus link ini?");
+        if (confirmDel) {
+          const updated = links.filter((l, i) => i !== index);
+          saveDiscordLinks(updated);
+          renderDiscordLinksForAdmin();
+        }
+      });
+
+      li.appendChild(a);
+      li.appendChild(btnRemove);
+      discordLinksAdmin.appendChild(li);
+    });
+  }
+
+  function renderWebsiteLinksForAdmin() {
+    const links = getWebsiteLinks();
+    websiteLinksAdmin.innerHTML = "";
+    if (links.length === 0) {
+      websiteLinksAdmin.innerHTML = "<li>Belum ada link website ditambahkan.</li>";
+      return;
+    }
+    links.forEach((link, index) => {
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      a.href = link;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      a.textContent = link;
+
+      const btnRemove = document.createElement('button');
+      btnRemove.textContent = "Hapus";
+      btnRemove.title = "Hapus Link";
+      btnRemove.addEventListener('click', () => {
+        const confirmDel = confirm("Yakin ingin menghapus link ini?");
+        if (confirmDel) {
+          const updated = links.filter((l, i) => i !== index);
+          saveWebsiteLinks(updated);
+          renderWebsiteLinksForAdmin();
+        }
+      });
+
+      li.appendChild(a);
+      li.appendChild(btnRemove);
+      websiteLinksAdmin.appendChild(li);
+    });
+  }
+
+  // Authentication handlers
+  residentLoginForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const username = residentLoginForm['resident-login-username'].value.trim();
+    const password = residentLoginForm['resident-login-password'].value;
+
+    const residents = getResidents();
+    const user = residents.find(u => u.username === username && u.password === password);
+
+    if (user) {
+      setResidentSession(username);
+      showResidentDashboard(username);
+    } else {
+      residentLoginMessage.textContent = "Username atau password salah.";
+      residentLoginMessage.className = "message error";
+    }
+  });
+
+  residentRegisterForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const username = residentRegisterForm['resident-register-username'].value.trim();
+    const password = residentRegisterForm['resident-register-password'].value;
+
+    if (username.length < 3) {
+      residentRegisterMessage.textContent = "Username harus minimal 3 karakter.";
+      residentRegisterMessage.className = "message error";
+      return;
+    }
+    if (password.length < 5) {
+      residentRegisterMessage.textContent = "Password harus minimal 5 karakter.";
+      residentRegisterMessage.className = "message error";
+      return;
+    }
+
+    let residents = getResidents();
+    if (residents.find(u => u.username === username)) {
+      residentRegisterMessage.textContent = "Username sudah terdaftar.";
+      residentRegisterMessage.className = "message error";
+      return;
+    }
+
+    residents.push({username, password});
+    saveResidents(residents);
+
+    residentRegisterMessage.textContent = "Pendaftaran berhasil! Silakan login.";
+    residentRegisterMessage.className = "message success";
+
+    residentRegisterForm.reset();
+  });
+
+  adminLoginForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const username = adminLoginForm['admin-login-username'].value.trim();
+    const password = adminLoginForm['admin-login-password'].value;
+
+    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+      setAdminSession();
+      showAdminDashboard();
+    } else {
+      adminLoginMessage.textContent = "Username atau password admin salah.";
+      adminLoginMessage.className = "message error";
+    }
+  });
+
+  // Discord server links add in admin dashboard
+  addDiscordForm.addEventListener('submit', e => {
+    e.preventDefault();
+    let input = addDiscordForm['discord-link-input'].value.trim();
+    if (!input) return;
+
+    // Validate URL basic check for Discord
+    try {
+      let url = new URL(input);
+      if (!url.hostname.includes("discord.gg") && !url.hostname.includes("discord.com")) {
+        addDiscordMessage.textContent = "Link harus dari domain Discord.";
+        addDiscordMessage.className = "message error";
+        return;
+      }
+    } catch {
+      addDiscordMessage.textContent = "Masukkan link URL yang valid.";
+      addDiscordMessage.className = "message error";
+      return;
+    }
+
+    let links = getDiscordLinks();
+    if (links.includes(input)) {
+      addDiscordMessage.textContent = "Link sudah ada.";
+      addDiscordMessage.className = "message error";
+      return;
+    }
+
+    links.push(input);
+    saveDiscordLinks(links);
+    renderDiscordLinksForAdmin();
+
+    addDiscordMessage.textContent = "Link berhasil ditambahkan.";
+    addDiscordMessage.className = "message success";
+    addDiscordForm.reset();
+  });
+
+  // Website links add in admin dashboard
+  addWebsiteForm.addEventListener('submit', e => {
+    e.preventDefault();
+    let input = addWebsiteForm['website-link-input'].value.trim();
+    if (!input) return;
+
+    // Validate URL general check
+    try {
+      new URL(input);
+    } catch {
+      addWebsiteMessage.textContent = "Masukkan link URL yang valid.";
+      addWebsiteMessage.className = "message error";
+      return;
+    }
+
+    let links = getWebsiteLinks();
+    if (links.includes(input)) {
+      addWebsiteMessage.textContent = "Link sudah ada.";
+      addWebsiteMessage.className = "message error";
+      return;
+    }
+
+    links.push(input);
+    saveWebsiteLinks(links);
+    renderWebsiteLinksForAdmin();
+
+    addWebsiteMessage.textContent = "Link berhasil ditambahkan.";
+    addWebsiteMessage.className = "message success";
+    addWebsiteForm.reset();
+  });
+
+  // Logout handlers
+  residentLogoutBtn.addEventListener('click', () => {
+    clearResidentSession();
+    switchToGuestView();
+  });
+
+  adminLogoutBtn.addEventListener('click', () => {
+    clearAdminSession();
+    switchToGuestView();
+  });
+
+  // Show dashboards
+  function showResidentDashboard(username) {
+    sections.login.style.display = "none";
+    sections.register.style.display = "none";
+    sections.adminLogin.style.display = "none";
+    sections.adminDashboard.style.display = "none";
+
+    residentUsernameDisplay.textContent = sanitizeInput(username);
+    renderDiscordLinksForResident();
+    renderWebsiteLinksForResident();
+    sections.residentDashboard.style.display = "block";
+
+    // deactivate tabs since logged in
+    Object.values(tabs).forEach(t => t.classList.remove('active'));
+  }
+
+  function showAdminDashboard() {
+    sections.login.style.display = "none";
+    sections.register.style.display = "none";
+    sections.adminLogin.style.display = "none";
+    sections.residentDashboard.style.display = "none";
+
+    renderDiscordLinksForAdmin();
+    renderWebsiteLinksForAdmin();
+    sections.adminDashboard.style.display = "block";
+
+    // deactivate tabs since logged in
+    Object.values(tabs).forEach(t => t.classList.remove('active'));
+  }
+
+  // Switch to guest view (login/register/admin login options)
+  function switchToGuestView() {
+    sections.residentDashboard.style.display = "none";
+    sections.adminDashboard.style.display = "none";
+    switchTab('login');
+  }
+
+  // Tab click events
+  tabs.login.addEventListener('click', () => switchTab('login'));
+  tabs.register.addEventListener('click', () => switchTab('register'));
+  tabs.adminLogin.addEventListener('click', () => switchTab('adminLogin'));
+
+  // On page load, check if user/admin already logged in
+  function tryAutoLogin() {
+    const loggedResident = getResidentSession();
+    if (loggedResident) {
+      showResidentDashboard(loggedResident);
+      return;
+    }
+    if (getAdminSession()) {
+      showAdminDashboard();
+      return;
+    }
+    switchTab('login');
+  }
+
+  tryAutoLogin();
+
+})();
+</script>
+
+</body>
+</html>
